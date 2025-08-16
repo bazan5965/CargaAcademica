@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Académico con Indicadores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .message-container {
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .message-container.visible {
+            opacity: 1;
+            max-height: 100px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 relative">
+
+    <!-- La pantalla de carga ha sido eliminada. El contenido se muestra de inmediato. -->
+    <div id="main-content" class="container bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Formulario Académico</h1>
+            <p class="mt-2 text-gray-600">Calcula tus indicadores de avance.</p>
+            <div class="mt-4 p-2 bg-indigo-100 rounded-md text-indigo-700 text-sm font-medium" id="user-id-display">
+                ID de Usuario: N/A
+            </div>
+        </header>
+
+        <form id="academic-form">
+            <!-- Nuevo campo para el número de boleta -->
+            <section class="p-4 bg-gray-50 rounded-md mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Información del Estudiante</h2>
+                <div class="mb-4">
+                    <label for="student-id" class="block text-sm font-medium text-gray-700">Número de Boleta:</label>
+                    <input type="text" id="student-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Ej. 2023xxxxxx" required>
+                </div>
+            </section>
+        
+            <!-- Sección de Programa Académico -->
+            <section class="p-4 bg-gray-50 rounded-md mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Programa Académico</h2>
+                
+                <div class="mb-4">
+                    <label for="program-select" class="block text-sm font-medium text-gray-700">Selecciona tu programa académico:</label>
+                    <select id="program-select" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="tronco-comun">Tronco común de la L.F. y M.</option>
+                        <option value="opcion-matematicas">Opción en Matemáticas</option>
+                        <option value="opcion-fisica">Opción en Física</option>
+                        <option value="opcion-matematica-educativa">Opción en Matemática Educativa</option>
+                        <option value="ing-matematica">Ing. Matemática</option>
+                        <!-- Nueva opción añadida -->
+                        <option value="ing-nuclear">Ingeniería Nuclear</option>
+                    </select>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="total-program-credits" class="block text-sm font-medium text-gray-700">
+                            Créditos Totales del Programa:
+                        </label>
+                        <input type="number" id="total-program-credits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-gray-200" min="0" required readonly>
+                    </div>
+                    <div>
+                        <label for="total-program-semesters" class="block text-sm font-medium text-gray-700">
+                            Semestres Totales del Programa:
+                        </label>
+                        <input type="number" id="total-program-semesters" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-gray-200" min="1" required readonly>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Indicadores Académicos -->
+            <section class="p-4 bg-gray-50 rounded-md mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Cálculo de Indicadores Académicos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="accredited-credits" class="block text-sm font-medium text-gray-700">
+                            Número de créditos acreditados:
+                        </label>
+                        <input type="number" id="accredited-credits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="0" required>
+                    </div>
+                    <div>
+                        <label for="accredited-materias" class="block text-sm font-medium text-gray-700">
+                            Número de unidades de aprendizaje acreditadas:
+                        </label>
+                        <input type="number" id="accredited-materias" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="0" required>
+                    </div>
+                    <div>
+                        <label for="school-periods" class="block text-sm font-medium text-gray-700">
+                            Cantidad de periodos escolares cursados:
+                        </label>
+                        <input type="number" id="school-periods" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="1" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <div class="p-4 bg-gray-100 rounded-md text-center">
+                        <h4 class="text-md font-semibold text-gray-700">Indicador de Avance:</h4>
+                        <p id="indicador-output" class="text-3xl font-bold text-indigo-600 mt-2">N/A</p>
+                        <p class="text-sm text-gray-500 mt-1">Créditos Faltantes / Semestres Restantes</p>
+                        <p id="indicador-message" class="mt-2 text-red-600 text-sm font-semibold hidden">
+                            ¡Advertencia! El indicador es crítico (≥ 33 o mayor a la Carga Media).
+                        </p>
+                    </div>
+                    <div class="p-4 bg-gray-100 rounded-md text-center">
+                        <h4 class="text-md font-semibold text-gray-700">Velocidad de Avance:</h4>
+                        <p id="velocidad-output" class="text-3xl font-bold text-indigo-600 mt-2">N/A</p>
+                        <p class="text-sm text-gray-500 mt-1">Unidades Acreditadas / Semestres Cursados</p>
+                        <p id="velocidad-message" class="mt-2 text-red-600 text-sm font-semibold hidden">
+                            ¡Advertencia! La velocidad es baja (≤ 2).
+                        </p>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="text-center mt-8 no-print grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button type="submit" class="w-full px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Guardar Datos (Firebase)
+                </button>
+                <button type="button" id="send-to-sheets-btn" class="w-full px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Enviar a Google Sheets
+                </button>
+            </div>
+            
+            <!-- Mensajes de estado -->
+            <div id="feedback-message" class="message-container bg-gray-100 p-3 rounded-md text-sm text-center font-medium"></div>
+        </form>
+    </div>
+
+    <!-- Importar las librerías de Firebase y toda la lógica del formulario -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variables globales proporcionadas por el entorno
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Inicializar Firebase
+        let app, db, auth;
+        let userId = null;
+        let authReady = false;
+
+        // Definición de los programas académicos y sus cargas
+        const academicPrograms = {
+            'tronco-comun': {
+                name: 'Tronco común de la L.F. y M.',
+                creditosTotales: 312,
+                semestresTotales: 12,
+                cargaMedia: 40,
+                cargaMaxima: 50,
+                cargaMinima: 30
+            },
+            'opcion-matematicas': {
+                name: 'Opción en Matemáticas',
+                creditosTotales: 312,
+                semestresTotales: 12,
+                cargaMedia: 40,
+                cargaMaxima: 50,
+                cargaMinima: 30
+            },
+            'opcion-fisica': {
+                name: 'Opción en Física',
+                creditosTotales: 316,
+                semestresTotales: 12,
+                cargaMedia: 40,
+                cargaMaxima: 50,
+                cargaMinima: 30
+            },
+            'opcion-matematica-educativa': {
+                name: 'Opción en Matemática Educativa',
+                creditosTotales: 318,
+                semestresTotales: 12,
+                cargaMedia: 40,
+                cargaMaxima: 50,
+                cargaMinima: 30
+            },
+            'ing-matematica': {
+                name: 'Ing. Matemática',
+                creditosTotales: 336,
+                semestresTotales: 12,
+                cargaMedia: 42,
+                cargaMaxima: 52,
+                cargaMinima: 32
+            },
+            // Se agregó Ingeniería Nuclear
+            'ing-nuclear': {
+                name: 'Ingeniería Nuclear',
+                creditosTotales: 350, // Valor supuesto, puedes ajustarlo
+                semestresTotales: 12,
+                cargaMedia: 45, // Valor supuesto, puedes ajustarlo
+                cargaMaxima: 55, // Valor supuesto, puedes ajustarlo
+                cargaMinima: 35 // Valor supuesto, puedes ajustarlo
+            }
+        };
+
+        // Global variables for form elements
+        const form = document.getElementById('academic-form');
+        const studentIdInput = document.getElementById('student-id');
+        const creditsInput = document.getElementById('accredited-credits');
+        const materiasInput = document.getElementById('accredited-materias');
+        const periodsInput = document.getElementById('school-periods');
+        const totalProgramCreditsInput = document.getElementById('total-program-credits');
+        const totalProgramSemestersInput = document.getElementById('total-program-semesters');
+        const programSelect = document.getElementById('program-select');
+        const feedbackMessageDiv = document.getElementById('feedback-message');
+        const sendToSheetsBtn = document.getElementById('send-to-sheets-btn');
+
+        // Added for loading state
+        const mainContent = document.getElementById('main-content');
+        
+        // Función para mostrar mensajes de estado
+        function showFeedback(message, isSuccess = false) {
+            feedbackMessageDiv.textContent = message;
+            feedbackMessageDiv.classList.add('visible');
+            if (isSuccess) {
+                feedbackMessageDiv.classList.remove('text-red-600');
+                feedbackMessageDiv.classList.add('bg-green-100', 'text-green-700');
+            } else {
+                feedbackMessageDiv.classList.remove('bg-green-100', 'text-green-700');
+                feedbackMessageDiv.classList.add('text-red-600');
+            }
+            setTimeout(() => {
+                feedbackMessageDiv.classList.remove('visible');
+            }, 5000);
+        }
+
+        // Función para autenticar al usuario
+        async function authenticate() {
+            try {
+                // Ya no mostramos la pantalla de carga, el formulario es visible desde el principio.
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser.uid;
+                document.getElementById('user-id-display').textContent = `ID de Usuario: ${userId}`;
+                authReady = true;
+
+                console.log('Autenticación exitosa.');
+                
+                // Llama a la función de carga de datos una vez que la autenticación esté lista.
+                loadData();
+
+            } catch (error) {
+                console.error("Error al autenticar:", error);
+                showFeedback("Error de autenticación: Por favor, intente recargar la página.", false);
+            }
+        }
+
+        // Función para cargar los datos privados del usuario desde Firestore
+        async function loadData() {
+            if (!authReady || !userId) {
+                return;
+            }
+            try {
+                const formDocRef = doc(db, 'artifacts', appId, 'users', userId, 'academic_complete_forms', 'my_form');
+                const formDoc = await getDoc(formDocRef);
+
+                if (formDoc.exists()) {
+                    const data = formDoc.data();
+                    
+                    if (data.programaAcademico) {
+                        document.getElementById('program-select').value = data.programaAcademico;
+                        updateProgramInfo(data.programaAcademico);
+                    }
+                    
+                    document.getElementById('student-id').value = data.studentId || '';
+                    document.getElementById('accredited-credits').value = data.accreditedCredits || '';
+                    document.getElementById('accredited-materias').value = data.accreditedMaterias || '';
+                    document.getElementById('school-periods').value = data.schoolPeriods || '';
+
+                    calculateIndicators();
+
+                    console.log('Datos cargados exitosamente desde la base de datos.');
+                } else {
+                    document.getElementById('user-id-display').textContent = `ID de Usuario: ${userId}`;
+                    console.log('No se encontraron datos guardados para este usuario.');
+                    calculateIndicators(); 
+                }
+            } catch (error) {
+                console.error("Error al cargar los datos:", error);
+            }
+        }
+        
+        // Función para guardar los datos en Firestore (privado)
+        async function saveData(data) {
+            if (!authReady || !userId) {
+                console.log("Error: El usuario no está autenticado.");
+                return;
+            }
+            try {
+                const privateDocRef = doc(db, 'artifacts', appId, 'users', userId, 'academic_complete_forms', 'my_form');
+                await setDoc(privateDocRef, data);
+                
+                showFeedback("¡Datos guardados correctamente en Firebase!", true);
+                console.log("¡Datos guardados correctamente en Firebase!");
+            } catch (error) {
+                console.error("Error al guardar los datos:", error);
+                showFeedback("Hubo un error al guardar los datos.", false);
+            }
+        }
+        
+        // Función para enviar los datos a Google Sheets
+        async function sendDataToGoogleSheets() {
+            const formElement = document.getElementById('academic-form');
+            const studentId = formElement['student-id'].value;
+            const programId = formElement['program-select'].value;
+            const accreditedCredits = formElement['accredited-credits'].value;
+            const accreditedMaterias = formElement['accredited-materias'].value;
+            const schoolPeriods = formElement['school-periods'].value;
+
+            const indicadorValue = document.getElementById('indicador-output').textContent;
+            const velocidadValue = document.getElementById('velocidad-output').textContent;
+            
+            if (!studentId || !programId || !accreditedCredits || !accreditedMaterias || !schoolPeriods) {
+                showFeedback("Por favor, complete todos los campos obligatorios antes de enviar a Google Sheets.", false);
+                return;
+            }
+            
+            showFeedback("Enviando datos a Google Sheets...", false);
+            
+            const datos = {
+                boleta: studentId,
+                programa: academicPrograms[programId] ? academicPrograms[programId].name : '',
+                creditos: accreditedCredits,
+                materias: accreditedMaterias,
+                semestres: schoolPeriods,
+                indicador: indicadorValue,
+                velocidad: velocidadValue
+            };
+            
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbw_RYE6VI4dIu-HeoAWH8_tWsGcvTqPxIaWNfwKLD-MeaDTd8pmznPHeHg2w2Y663U/exec";
+            
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: "POST",
+                    body: JSON.stringify(datos)
+                });
+                
+                if (response.ok) {
+                    showFeedback("✅ Datos enviados correctamente a Google Sheets!", true);
+                    console.log("✅ Datos enviados correctamente a Google Sheets!");
+                } else {
+                    showFeedback("❌ Hubo un error al enviar los datos a Google Sheets.", false);
+                    console.log("❌ Hubo un error al enviar los datos a Google Sheets.");
+                }
+            } catch (err) {
+                console.error("Error al enviar datos:", err);
+                showFeedback("❌ Hubo un error de conexión al enviar los datos.", false);
+            }
+        }
+
+
+        // Función para calcular ambos indicadores de avance y velocidad
+        function calculateIndicators() {
+            const creditsInput = document.getElementById('accredited-credits');
+            const materiasInput = document.getElementById('accredited-materias');
+            const periodsInput = document.getElementById('school-periods');
+            const totalProgramCreditsInput = document.getElementById('total-program-credits');
+            const totalProgramSemestersInput = document.getElementById('total-program-semesters');
+
+            const velocidadOutput = document.getElementById('velocidad-output');
+            const velocidadMessage = document.getElementById('velocidad-message');
+            const indicadorOutput = document.getElementById('indicador-output');
+            const indicadorMessage = document.getElementById('indicador-message');
+            const selectedProgramId = document.getElementById('program-select').value;
+            
+            const accreditedCredits = parseFloat(creditsInput.value) || 0;
+            const accreditedMaterias = parseFloat(materiasInput.value) || 0;
+            const schoolPeriods = parseFloat(periodsInput.value) || 0;
+            const totalProgramCredits = parseFloat(totalProgramCreditsInput.value) || 0;
+            const totalProgramSemesters = parseFloat(totalProgramSemestersInput.value) || 0;
+            
+            let programCargaMedia = 0;
+            if (selectedProgramId && academicPrograms[selectedProgramId]) {
+                programCargaMedia = academicPrograms[selectedProgramId].cargaMedia;
+            }
+
+            // Calculo de Velocidad
+            if (schoolPeriods > 0) {
+                const velocidad = accreditedMaterias / schoolPeriods;
+                velocidadOutput.textContent = velocidad.toFixed(2);
+                if (velocidad <= 2) {
+                    velocidadMessage.classList.remove('hidden');
+                } else {
+                    velocidadMessage.classList.add('hidden');
+                }
+            } else {
+                velocidadOutput.textContent = "N/A";
+                velocidadMessage.classList.add('hidden');
+            }
+
+            // Calculo de Indicador
+            if (totalProgramSemesters > schoolPeriods && totalProgramSemesters > 0) {
+                const remainingCredits = totalProgramCredits - accreditedCredits;
+                const remainingSemesters = totalProgramSemesters - schoolPeriods;
+                
+                if (remainingSemesters > 0) {
+                    const indicador = remainingCredits / remainingSemesters;
+                    indicadorOutput.textContent = indicador.toFixed(2);
+                    if (indicador >= 33 || indicador > programCargaMedia) {
+                        indicadorMessage.classList.remove('hidden');
+                    } else {
+                        indicadorMessage.classList.add('hidden');
+                    }
+                } else {
+                    indicadorOutput.textContent = "N/A";
+                    indicadorMessage.classList.add('hidden');
+                }
+            } else {
+                indicadorOutput.textContent = "N/A";
+                indicadorMessage.classList.add('hidden');
+            }
+        }
+        
+        function updateProgramInfo(programId) {
+            const totalProgramCreditsInput = document.getElementById('total-program-credits');
+            const totalProgramSemestersInput = document.getElementById('total-program-semesters');
+            const selectedProgramInfo = academicPrograms[programId];
+            
+            if (selectedProgramInfo) {
+                totalProgramCreditsInput.value = selectedProgramInfo.creditosTotales;
+                totalProgramSemestersInput.value = selectedProgramInfo.semestresTotales;
+                calculateIndicators();
+            } else {
+                totalProgramCreditsInput.value = '';
+                totalProgramSemestersInput.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event listener para el cálculo de los indicadores en tiempo real
+            creditsInput.addEventListener('input', calculateIndicators);
+            materiasInput.addEventListener('input', calculateIndicators);
+            periodsInput.addEventListener('input', calculateIndicators);
+
+            // Event listener para la selección de programa para llenar los campos y disparar la validación
+            programSelect.addEventListener('change', (e) => {
+                const programId = e.target.value;
+                updateProgramInfo(programId);
+            });
+
+            // Lógica para guardar los datos en Firebase
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const studentId = studentIdInput.value;
+                const accreditedCredits = parseFloat(creditsInput.value);
+                const accreditedMaterias = parseFloat(materiasInput.value);
+                const schoolPeriods = parseFloat(periodsInput.value);
+                const programId = programSelect.value;
+
+                if (!studentId) {
+                    showFeedback("Por favor, ingrese su Número de Boleta.", false);
+                    return;
+                }
+                if (!programId || programId === "") {
+                    showFeedback("Por favor, seleccione un programa académico.", false);
+                    return;
+                }
+                const programInfo = academicPrograms[programId];
+                const totalProgramCredits = programInfo.creditosTotales;
+                const totalProgramSemesters = programInfo.semestresTotales;
+                
+                if (isNaN(accreditedCredits) || isNaN(accreditedMaterias) || isNaN(schoolPeriods) || schoolPeriods <= 0) {
+                    showFeedback("Por favor, ingrese valores numéricos válidos. El número de periodos y semestres totales debe ser mayor a cero.", false);
+                    return;
+                }
+                
+                let velocidad = 0;
+                if (schoolPeriods > 0) {
+                    velocidad = accreditedMaterias / schoolPeriods;
+                }
+                
+                let indicador = 0;
+                const remainingSemesters = totalProgramSemesters - schoolPeriods;
+                if (remainingSemesters > 0) {
+                    const remainingCredits = totalProgramCredits - accreditedCredits;
+                    indicador = remainingCredits / remainingSemesters;
+                }
+
+                const dataToSave = {
+                    studentId: studentId,
+                    programaAcademico: programId,
+                    accreditedCredits: accreditedCredits,
+                    accreditedMaterias: accreditedMaterias,
+                    schoolPeriods: schoolPeriods,
+                    totalProgramCredits: totalProgramCredits,
+                    totalProgramSemesters: totalProgramSemesters,
+                    velocidad: velocidad,
+                    indicador: indicador,
+                };
+                
+                await saveData(dataToSave);
+            });
+            
+            // Se agregó un "event listener" para el botón de "Google Sheets"
+            sendToSheetsBtn.addEventListener('click', sendDataToGoogleSheets);
+
+            // Iniciar autenticación y carga de datos. El formulario es visible desde el principio.
+            authenticate();
+        });
+    </script>
+</body>
+</html>
