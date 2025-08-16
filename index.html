@@ -38,8 +38,8 @@
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Información del Estudiante</h2>
                 <div class="mb-4">
                     <label for="student-id" class="block text-sm font-medium text-gray-700">Número de Boleta:</label>
-                    <!-- El tipo de input ha sido cambiado a "number" -->
-                    <input type="number" id="student-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Ej. 2023xxxxxx" required>
+                    <!-- Se cambió el tipo a "text" y se agregaron las restricciones de longitud -->
+                    <input type="text" id="student-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Ej. 2023xxxxxx" minlength="10" maxlength="10" required>
                 </div>
             </section>
         
@@ -306,8 +306,12 @@
             const schoolPeriods = formElement['school-periods'].value;
             
             // Validaciones antes de enviar
-            if (!isNumeric(studentId) || studentId === '') {
-                showFeedback("Por favor, ingrese un Número de Boleta válido (solo números).", false);
+            if (studentId.length !== 10) {
+                showFeedback("Por favor, ingrese un Número de Boleta de 10 dígitos.", false);
+                return;
+            }
+            if (!isNumeric(studentId)) {
+                showFeedback("El Número de Boleta solo debe contener números.", false);
                 return;
             }
             if (!programId) {
@@ -461,3 +465,4 @@
     </script>
 </body>
 </html>
+
