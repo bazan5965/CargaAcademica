@@ -30,9 +30,6 @@
         <header class="text-center mb-8">
             <h1 class="text-2xl font-bold text-gray-800">Formulario Académico</h1>
             <p class="mt-2 text-gray-600">Calcula tus indicadores de avance.</p>
-            <div class="mt-4 p-2 bg-indigo-100 rounded-md text-indigo-700 text-sm font-medium" id="user-id-display">
-                ID de Usuario: N/A
-            </div>
         </header>
 
         <form id="academic-form">
@@ -41,7 +38,8 @@
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Información del Estudiante</h2>
                 <div class="mb-4">
                     <label for="student-id" class="block text-sm font-medium text-gray-700">Número de Boleta:</label>
-                    <input type="text" id="student-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Ej. 2023xxxxxx" required>
+                    <!-- El tipo de input ha sido cambiado a "number" -->
+                    <input type="number" id="student-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Ej. 2023xxxxxx" required>
                 </div>
             </section>
         
@@ -87,19 +85,22 @@
                         <label for="accredited-credits" class="block text-sm font-medium text-gray-700">
                             Número de créditos acreditados:
                         </label>
-                        <input type="number" id="accredited-credits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="0" required>
+                        <!-- Se cambió el tipo a "text" para un control de validación más robusto -->
+                        <input type="text" id="accredited-credits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="0" required>
                     </div>
                     <div>
                         <label for="accredited-materias" class="block text-sm font-medium text-gray-700">
                             Número de unidades de aprendizaje acreditadas:
                         </label>
-                        <input type="number" id="accredited-materias" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="0" required>
+                        <!-- Se cambió el tipo a "text" para un control de validación más robusto -->
+                        <input type="text" id="accredited-materias" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="0" required>
                     </div>
                     <div>
                         <label for="school-periods" class="block text-sm font-medium text-gray-700">
                             Cantidad de periodos escolares cursados:
                         </label>
-                        <input type="number" id="school-periods" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="1" required>
+                        <!-- Se cambió el tipo a "text" para un control de validación más robusto -->
+                        <input type="text" id="school-periods" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" min="1" required>
                     </div>
                 </div>
 
@@ -123,11 +124,9 @@
                 </div>
             </section>
             
-            <div class="text-center mt-8 no-print grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button type="submit" class="w-full px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Guardar Datos (Firebase)
-                </button>
-                <button type="button" id="send-to-sheets-btn" class="w-full px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <!-- El botón ahora está centrado -->
+            <div class="text-center mt-8 no-print flex justify-center">
+                <button type="button" id="send-to-sheets-btn" class="w-full md:w-auto px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                     Enviar a Google Sheets
                 </button>
             </div>
@@ -195,7 +194,6 @@
                 cargaMaxima: 52,
                 cargaMinima: 32
             },
-            // Se agregó Ingeniería Nuclear
             'ing-nuclear': {
                 name: 'Ingeniería Nuclear',
                 creditosTotales: 350, // Valor supuesto, puedes ajustarlo
@@ -217,9 +215,6 @@
         const programSelect = document.getElementById('program-select');
         const feedbackMessageDiv = document.getElementById('feedback-message');
         const sendToSheetsBtn = document.getElementById('send-to-sheets-btn');
-
-        // Added for loading state
-        const mainContent = document.getElementById('main-content');
         
         // Función para mostrar mensajes de estado
         function showFeedback(message, isSuccess = false) {
@@ -237,10 +232,14 @@
             }, 5000);
         }
 
+        // Función para validar que un valor sea numérico y no contenga notación científica
+        function isNumeric(value) {
+            return !isNaN(parseFloat(value)) && isFinite(value) && String(value).indexOf('e') === -1;
+        }
+
         // Función para autenticar al usuario
         async function authenticate() {
             try {
-                // Ya no mostramos la pantalla de carga, el formulario es visible desde el principio.
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -251,12 +250,10 @@
                     await signInAnonymously(auth);
                 }
                 userId = auth.currentUser.uid;
-                document.getElementById('user-id-display').textContent = `ID de Usuario: ${userId}`;
                 authReady = true;
 
                 console.log('Autenticación exitosa.');
                 
-                // Llama a la función de carga de datos una vez que la autenticación esté lista.
                 loadData();
 
             } catch (error) {
@@ -291,30 +288,11 @@
 
                     console.log('Datos cargados exitosamente desde la base de datos.');
                 } else {
-                    document.getElementById('user-id-display').textContent = `ID de Usuario: ${userId}`;
                     console.log('No se encontraron datos guardados para este usuario.');
                     calculateIndicators(); 
                 }
             } catch (error) {
                 console.error("Error al cargar los datos:", error);
-            }
-        }
-        
-        // Función para guardar los datos en Firestore (privado)
-        async function saveData(data) {
-            if (!authReady || !userId) {
-                console.log("Error: El usuario no está autenticado.");
-                return;
-            }
-            try {
-                const privateDocRef = doc(db, 'artifacts', appId, 'users', userId, 'academic_complete_forms', 'my_form');
-                await setDoc(privateDocRef, data);
-                
-                showFeedback("¡Datos guardados correctamente en Firebase!", true);
-                console.log("¡Datos guardados correctamente en Firebase!");
-            } catch (error) {
-                console.error("Error al guardar los datos:", error);
-                showFeedback("Hubo un error al guardar los datos.", false);
             }
         }
         
@@ -326,15 +304,40 @@
             const accreditedCredits = formElement['accredited-credits'].value;
             const accreditedMaterias = formElement['accredited-materias'].value;
             const schoolPeriods = formElement['school-periods'].value;
-
-            const indicadorValue = document.getElementById('indicador-output').textContent;
-            const velocidadValue = document.getElementById('velocidad-output').textContent;
             
-            if (!studentId || !programId || !accreditedCredits || !accreditedMaterias || !schoolPeriods) {
-                showFeedback("Por favor, complete todos los campos obligatorios antes de enviar a Google Sheets.", false);
+            // Validaciones antes de enviar
+            if (!isNumeric(studentId) || studentId === '') {
+                showFeedback("Por favor, ingrese un Número de Boleta válido (solo números).", false);
+                return;
+            }
+            if (!programId) {
+                showFeedback("Por favor, seleccione su programa académico.", false);
+                return;
+            }
+            if (!isNumeric(accreditedCredits) || accreditedCredits === '') {
+                showFeedback("Por favor, ingrese un número válido para los créditos acreditados.", false);
+                return;
+            }
+            if (!isNumeric(accreditedMaterias) || accreditedMaterias === '') {
+                showFeedback("Por favor, ingrese un número válido para las unidades de aprendizaje.", false);
+                return;
+            }
+            if (!isNumeric(schoolPeriods) || schoolPeriods === '') {
+                showFeedback("Por favor, ingrese un número válido para los periodos escolares.", false);
                 return;
             }
             
+            // Validaciones de rangos (nueva funcionalidad)
+            const totalProgramCredits = parseFloat(totalProgramCreditsInput.value);
+            if (parseFloat(accreditedCredits) > totalProgramCredits) {
+                 showFeedback(`El número de créditos acreditados no puede ser mayor a los créditos totales del programa (${totalProgramCredits}).`, false);
+                return;
+            }
+            if (parseFloat(accreditedMaterias) > 35) {
+                showFeedback(`El número de unidades de aprendizaje no puede ser mayor a 35.`, false);
+                return;
+            }
+
             showFeedback("Enviando datos a Google Sheets...", false);
             
             const datos = {
@@ -343,8 +346,8 @@
                 creditos: accreditedCredits,
                 materias: accreditedMaterias,
                 semestres: schoolPeriods,
-                indicador: indicadorValue,
-                velocidad: velocidadValue
+                indicador: document.getElementById('indicador-output').textContent,
+                velocidad: document.getElementById('velocidad-output').textContent
             };
             
             const scriptUrl = "https://script.google.com/macros/s/AKfycbw_RYE6VI4dIu-HeoAWH8_tWsGcvTqPxIaWNfwKLD-MeaDTd8pmznPHeHg2w2Y663U/exec";
@@ -368,26 +371,19 @@
             }
         }
 
-
         // Función para calcular ambos indicadores de avance y velocidad
         function calculateIndicators() {
-            const creditsInput = document.getElementById('accredited-credits');
-            const materiasInput = document.getElementById('accredited-materias');
-            const periodsInput = document.getElementById('school-periods');
-            const totalProgramCreditsInput = document.getElementById('total-program-credits');
-            const totalProgramSemestersInput = document.getElementById('total-program-semesters');
-
-            const velocidadOutput = document.getElementById('velocidad-output');
-            const velocidadMessage = document.getElementById('velocidad-message');
-            const indicadorOutput = document.getElementById('indicador-output');
-            const indicadorMessage = document.getElementById('indicador-message');
-            const selectedProgramId = document.getElementById('program-select').value;
-            
             const accreditedCredits = parseFloat(creditsInput.value) || 0;
             const accreditedMaterias = parseFloat(materiasInput.value) || 0;
             const schoolPeriods = parseFloat(periodsInput.value) || 0;
             const totalProgramCredits = parseFloat(totalProgramCreditsInput.value) || 0;
             const totalProgramSemesters = parseFloat(totalProgramSemestersInput.value) || 0;
+            
+            const velocidadOutput = document.getElementById('velocidad-output');
+            const velocidadMessage = document.getElementById('velocidad-message');
+            const indicadorOutput = document.getElementById('indicador-output');
+            const indicadorMessage = document.getElementById('indicador-message');
+            const selectedProgramId = document.getElementById('program-select').value;
             
             let programCargaMedia = 0;
             if (selectedProgramId && academicPrograms[selectedProgramId]) {
@@ -432,8 +428,6 @@
         }
         
         function updateProgramInfo(programId) {
-            const totalProgramCreditsInput = document.getElementById('total-program-credits');
-            const totalProgramSemestersInput = document.getElementById('total-program-semesters');
             const selectedProgramInfo = academicPrograms[programId];
             
             if (selectedProgramInfo) {
@@ -458,60 +452,6 @@
                 updateProgramInfo(programId);
             });
 
-            // Lógica para guardar los datos en Firebase
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const studentId = studentIdInput.value;
-                const accreditedCredits = parseFloat(creditsInput.value);
-                const accreditedMaterias = parseFloat(materiasInput.value);
-                const schoolPeriods = parseFloat(periodsInput.value);
-                const programId = programSelect.value;
-
-                if (!studentId) {
-                    showFeedback("Por favor, ingrese su Número de Boleta.", false);
-                    return;
-                }
-                if (!programId || programId === "") {
-                    showFeedback("Por favor, seleccione un programa académico.", false);
-                    return;
-                }
-                const programInfo = academicPrograms[programId];
-                const totalProgramCredits = programInfo.creditosTotales;
-                const totalProgramSemesters = programInfo.semestresTotales;
-                
-                if (isNaN(accreditedCredits) || isNaN(accreditedMaterias) || isNaN(schoolPeriods) || schoolPeriods <= 0) {
-                    showFeedback("Por favor, ingrese valores numéricos válidos. El número de periodos y semestres totales debe ser mayor a cero.", false);
-                    return;
-                }
-                
-                let velocidad = 0;
-                if (schoolPeriods > 0) {
-                    velocidad = accreditedMaterias / schoolPeriods;
-                }
-                
-                let indicador = 0;
-                const remainingSemesters = totalProgramSemesters - schoolPeriods;
-                if (remainingSemesters > 0) {
-                    const remainingCredits = totalProgramCredits - accreditedCredits;
-                    indicador = remainingCredits / remainingSemesters;
-                }
-
-                const dataToSave = {
-                    studentId: studentId,
-                    programaAcademico: programId,
-                    accreditedCredits: accreditedCredits,
-                    accreditedMaterias: accreditedMaterias,
-                    schoolPeriods: schoolPeriods,
-                    totalProgramCredits: totalProgramCredits,
-                    totalProgramSemesters: totalProgramSemesters,
-                    velocidad: velocidad,
-                    indicador: indicador,
-                };
-                
-                await saveData(dataToSave);
-            });
-            
             // Se agregó un "event listener" para el botón de "Google Sheets"
             sendToSheetsBtn.addEventListener('click', sendDataToGoogleSheets);
 
