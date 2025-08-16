@@ -363,11 +363,11 @@
                 });
                 
                 if (response.ok) {
-                    showFeedback("✅ Datos enviados correctamente a Google Sheets!", true);
-                    console.log("✅ Datos enviados correctamente a Google Sheets!");
+                    showFeedback("✅ Datos enviados correctamente", true);
+                    console.log("✅ Datos enviados correctamente");
                 } else {
-                    showFeedback("❌ Hubo un error al enviar los datos a Google Sheets.", false);
-                    console.log("❌ Hubo un error al enviar los datos a Google Sheets.");
+                    showFeedback("❌ Hubo un error al enviar los datos", false);
+                    console.log("❌ Hubo un error al enviar los datos");
                 }
             } catch (err) {
                 console.error("Error al enviar datos:", err);
